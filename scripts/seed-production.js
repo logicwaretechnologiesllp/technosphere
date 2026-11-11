@@ -142,7 +142,7 @@ async function seedProduction() {
       category_names: ['Lenovo Commercial', 'Lenovo Personal']
     },
     {
-      company_name: 'TechnoSphere Digital Media',
+      company_name: 'Technosphere Digital Media',
       contact_person: 'Ananya Patel',
       email: 'contact@technospheredigital.in',
       whatsapp_number: '+919812345678',
@@ -210,10 +210,10 @@ async function seedProduction() {
 
   // 5. Seed System Settings if table exists
   const defaultSettings = {
-    company_name: 'TechnoSphere Business Solutions',
+    company_name: 'Technosphere Business Solutions',
     official_email: 'sales@technosphere.in',
     phone_number: '+91 98765 43210',
-    office_address: 'TechnoSphere Tower, Cyber Hub, Industrial Zone',
+    office_address: 'Technosphere Tower, Cyber Hub, Industrial Zone',
     gstin_number: '27AAAAA0000A1Z5',
     default_gst_rate: 18.0,
     available_gst_slabs: [0, 5, 12, 18, 28],
@@ -231,7 +231,7 @@ async function seedProduction() {
     ],
     email_subject_prefix: 'Request for Quotation',
     email_footer_note: 'Please email your official quotation with price breakdown and lead time to sales@technosphere.in',
-    whatsapp_header: 'QUOTATION REQUEST - TechnoSphere',
+    whatsapp_header: 'QUOTATION REQUEST - Technosphere',
   };
 
   const { error: settingsError } = await supabase.from('system_settings').upsert({

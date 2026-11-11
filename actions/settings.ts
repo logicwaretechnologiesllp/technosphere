@@ -26,21 +26,21 @@ export interface SystemSettings {
 }
 
 const DEFAULT_SETTINGS: SystemSettings = {
-  company_name: 'TechnoSphere Business Solutions',
+  company_name: 'Technosphere Business Solutions',
   official_email: 'sales@technosphere.in',
   phone_number: '+91 98765 43210',
-  office_address: 'TechnoSphere Tower, Cyber Hub, Industrial Zone',
+  office_address: 'Technosphere Tower, Cyber Hub, Industrial Zone',
   gstin_number: '27AAAAA0000A1Z5',
   email_subject_prefix: 'Request for Quotation',
   email_footer_note: 'Please email your official quotation with price breakdown and lead time to sales@technosphere.in',
-  whatsapp_header: 'QUOTATION REQUEST - TechnoSphere',
+  whatsapp_header: 'QUOTATION REQUEST - Technosphere',
 
   smtp_host: '',
   smtp_port: 587,
   smtp_secure: false,
   smtp_user: '',
   smtp_pass: '',
-  smtp_from_name: 'TechnoSphere Procurement',
+  smtp_from_name: 'Technosphere Procurement',
   smtp_from_email: '',
   smtp_enabled: false,
 };

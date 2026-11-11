@@ -81,7 +81,7 @@ export function AdminSidebar({ pendingCount = 0, isMobile = false, onClose }: Ad
           </div>
           <div>
             <h1 className="font-bold text-slate-900 dark:text-slate-100 tracking-tight text-sm">
-              TechnoSphere
+              Technosphere
             </h1>
             <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Enterprise Portal</p>
           </div>

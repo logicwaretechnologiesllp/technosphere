@@ -1,6 +1,6 @@
 {
-  "name": "TechnoSphere — Enterprise RFQ Portal",
-  "short_name": "TechnoSphere",
+  "name": "Technosphere — Enterprise RFQ Portal",
+  "short_name": "Technosphere",
   "description": "Enterprise B2B Procurement, RFQ Quotation Management & Vendor Portal",
   "start_url": "/dashboard",
   "scope": "/",

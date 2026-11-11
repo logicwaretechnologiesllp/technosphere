@@ -13,9 +13,9 @@ export async function generateRfqPdf(lead: any, settings?: any): Promise<Buffer>
         bufferPages: true,
         info: {
           Title: `RFQ_${prReference}`,
-          Author: settings?.company_name || 'TechnoSphere Business Solutions',
+          Author: settings?.company_name || 'Technosphere Business Solutions',
           Subject: `Request for Quotation - ${lead.product_item || 'Procurement'}`,
-          Keywords: 'RFQ, Quotation, Procurement, TechnoSphere',
+          Keywords: 'RFQ, Quotation, Procurement, Technosphere',
         },
       });
 
@@ -453,7 +453,7 @@ export async function generateRfqPdf(lead: any, settings?: any): Promise<Buffer>
           .fontSize(7.5)
           .font('Helvetica')
           .text(
-            `Page ${i + 1} of ${range.count}  •  TechnoSphere Procurement Management System  •  Confidential RFQ`,
+            `Page ${i + 1} of ${range.count}  •  Technosphere Procurement Management System  •  Confidential RFQ`,
             margin,
             pageHeight - 24,
             { width: contentWidth, align: 'center' }

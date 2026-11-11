@@ -35,10 +35,10 @@ export function PwaRegister() {
         navigator.serviceWorker
           .register('/sw.js')
           .then((registration) => {
-            console.log('TechnoSphere PWA ServiceWorker registered:', registration.scope);
+            console.log('Technosphere PWA ServiceWorker registered:', registration.scope);
           })
           .catch((error) => {
-            console.error('TechnoSphere PWA ServiceWorker registration failed:', error);
+            console.error('Technosphere PWA ServiceWorker registration failed:', error);
           });
       });
     }
@@ -58,7 +58,7 @@ export function PwaRegister() {
       localStorage.setItem('technosphere-pwa-installed', 'true');
       setShowInstallBanner(false);
       setDeferredPrompt(null);
-      toast.success('TechnoSphere App Installed Successfully!');
+      toast.success('Technosphere App Installed Successfully!');
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -83,7 +83,7 @@ export function PwaRegister() {
 
     if (outcome === 'accepted') {
       localStorage.setItem('technosphere-pwa-installed', 'true');
-      toast.success('Installing TechnoSphere App...');
+      toast.success('Installing Technosphere App...');
     } else {
       sessionStorage.setItem('technosphere-pwa-dismissed', 'true');
     }
@@ -102,7 +102,7 @@ export function PwaRegister() {
             <Download className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h4 className="font-extrabold text-xs text-white">Install TechnoSphere App</h4>
+            <h4 className="font-extrabold text-xs text-white">Install Technosphere App</h4>
             <p className="text-[11px] text-slate-300 font-medium">Download to launch directly from desktop or mobile screen.</p>
           </div>
         </div>

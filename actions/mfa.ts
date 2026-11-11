@@ -160,13 +160,13 @@ export async function sendEmailOtpVerificationCode() {
         : undefined,
     });
 
-    const fromName = smtp.smtp_from_name || 'TechnoSphere Procurement';
+    const fromName = smtp.smtp_from_name || 'Technosphere Procurement';
     const fromEmail = smtp.smtp_from_email.trim();
 
     await transporter.sendMail({
       from: `"${fromName}" <${fromEmail}>`,
       to: user.email,
-      subject: 'TechnoSphere 2FA — Email Verification Code',
+      subject: 'Technosphere 2FA — Email Verification Code',
       html: `
         <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;">
           <div style="text-align: center; margin-bottom: 20px;">
@@ -181,7 +181,7 @@ export async function sendEmailOtpVerificationCode() {
           </div>
 
           <p style="font-size: 12px; color: #475569; line-height: 1.5; margin: 0 0 16px 0;">
-            Enter this 6-digit code in your TechnoSphere Settings panel to finalize turning on Email Two-Factor Authentication.
+            Enter this 6-digit code in your Technosphere Settings panel to finalize turning on Email Two-Factor Authentication.
           </p>
         </div>
       `,
@@ -343,16 +343,16 @@ export async function sendLoginEmailOtp(email: string) {
         : undefined,
     });
 
-    const fromName = smtp.smtp_from_name || 'TechnoSphere Portal';
+    const fromName = smtp.smtp_from_name || 'Technosphere Portal';
     const fromEmail = smtp.smtp_from_email.trim();
 
     await transporter.sendMail({
       from: `"${fromName}" <${fromEmail}>`,
       to: cleanEmail,
-      subject: 'TechnoSphere Login — 2FA Code',
+      subject: 'Technosphere Login — 2FA Code',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background: #ffffff;">
-          <h3 style="color: #4f46e5; margin-top: 0;">TechnoSphere Portal Login</h3>
+          <h3 style="color: #4f46e5; margin-top: 0;">Technosphere Portal Login</h3>
           <p style="font-size: 13px; color: #334155;">Your 6-digit Two-Factor Authentication login code is:</p>
           <div style="font-size: 30px; font-weight: bold; letter-spacing: 6px; padding: 15px; background: #f1f5f9; text-align: center; border-radius: 8px; font-family: monospace; color: #0f172a;">${code}</div>
           <p style="font-size: 11px; color: #94a3b8; margin-top: 15px;">Valid for 10 minutes. Do not share this code with anyone.</p>

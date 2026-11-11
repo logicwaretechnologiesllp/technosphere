@@ -212,7 +212,7 @@ export default function LoginPage() {
             {step === 'mfa' ? <ShieldCheck className="w-5 h-5" /> : <Layers className="w-5 h-5" />}
           </div>
           <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-            {step === 'mfa' ? 'Two-Factor Verification' : 'TechnoSphere Portal'}
+            {step === 'mfa' ? 'Two-Factor Verification' : 'Technosphere Portal'}
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
             {step === 'mfa'

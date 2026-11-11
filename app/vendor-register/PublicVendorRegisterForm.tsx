@@ -99,7 +99,7 @@ export function PublicVendorRegisterForm({ categories }: { categories: any[] }) 
           </div>
           <div>
             <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight">Vendor Partner Onboarding</h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">TechnoSphere Procurement Portal</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Technosphere Procurement Portal</p>
           </div>
         </div>
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">

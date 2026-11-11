@@ -847,7 +847,7 @@ export async function sendLeadToVendors(leadId: string, vendorIds: string[]) {
     }
 
     const fromAddress = settings?.smtp_from_email || settings?.official_email || 'sales@technosphere.in';
-    const fromName = settings?.smtp_from_name || 'TechnoSphere Procurement';
+    const fromName = settings?.smtp_from_name || 'Technosphere Procurement';
 
     let successCount = 0;
     let failedCount = 0;

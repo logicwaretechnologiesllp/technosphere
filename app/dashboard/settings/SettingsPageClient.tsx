@@ -251,7 +251,7 @@ export function SettingsPageClient({ categories, initialSettings }: SettingsPage
 
       const { data, error } = await supabase.auth.mfa.enroll({
         factorType: 'totp',
-        issuer: 'TechnoSphere',
+        issuer: 'Technosphere',
         friendlyName: 'Authenticator',
       });
 
@@ -1324,7 +1324,7 @@ export function SettingsPageClient({ categories, initialSettings }: SettingsPage
                     </button>
                   </div>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    Issuer: <strong className="text-slate-700 dark:text-slate-300">TechnoSphere</strong>
+                    Issuer: <strong className="text-slate-700 dark:text-slate-300">Technosphere</strong>
                   </p>
                 </div>
               </div>
@@ -1469,7 +1469,7 @@ export function SettingsPageClient({ categories, initialSettings }: SettingsPage
                   className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-center text-lg font-mono tracking-[0.4em] text-slate-900 dark:text-slate-100 font-bold focus:outline-none focus:border-indigo-500"
                 />
                 <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
-                  Check your inbox for the code from TechnoSphere.
+                  Check your inbox for the code from Technosphere.
                 </p>
               </div>
 

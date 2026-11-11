@@ -16,13 +16,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'TechnoSphere | Enterprise RFQ & Vendor Management System',
+  title: 'Technosphere | Enterprise RFQ & Vendor Management System',
   description: 'Enterprise B2B Procurement, RFQ Quotation Management & Vendor Portal',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'TechnoSphere',
+    title: 'Technosphere',
   },
   icons: {
     icon: '/icons/icon-192x192.png',

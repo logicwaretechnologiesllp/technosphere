@@ -1,11 +1,11 @@
-# TechnoSphere Procurement Architecture & Memory Record
+# Technosphere Procurement Architecture & Memory Record
 
-This document serves as the persistent architectural reference and memory record for the **TechnoSphere B2B Procurement & Quotation Management Application**.
+This document serves as the persistent architectural reference and memory record for the **Technosphere B2B Procurement & Quotation Management Application**.
 
 ---
 
 ## 1. System Overview & Purpose
-**TechnoSphere** is a production-grade enterprise procurement management portal designed to streamline Request for Quotation (RFQ) distribution, multi-vendor bidding, price negotiations, and final Purchase Order (PO) closure.
+**Technosphere** is a production-grade enterprise procurement management portal designed to streamline Request for Quotation (RFQ) distribution, multi-vendor bidding, price negotiations, and final Purchase Order (PO) closure.
 
 ### Key Objectives:
 1. **Vendor Directory**: Manage registered suppliers, contact personnel, categories of supply, GST verification, and communication logs.

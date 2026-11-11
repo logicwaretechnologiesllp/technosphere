@@ -348,7 +348,7 @@ BEGIN
     INSERT INTO public.vendors (id, company_name, contact_person, email, whatsapp_number, address, gst_number, notes, status, registration_status)
     VALUES
     (v1_id, 'Apex Infotech Solutions', 'Rajesh Sharma', 'sales@apexinfotech.com', '+919876543210', 'Plot 42, Tech Park, Electronic City, Bengaluru', '29ABCDE1234F1Z5', 'Authorized Lenovo Platinum Partner for Commercial & Workstations', 'active', 'approved'),
-    (v2_id, 'TechnoSphere Digital Media', 'Ananya Patel', 'contact@technospheredigital.in', '+919812345678', 'Suite 302, Cyber Tower, Hitec City, Hyderabad', '36AAACT9876Q1Z9', 'Specialized in Hardware Distribution & Cloud Licensing', 'active', 'approved'),
+    (v2_id, 'Technosphere Digital Media', 'Ananya Patel', 'contact@technospheredigital.in', '+919812345678', 'Suite 302, Cyber Tower, Hitec City, Hyderabad', '36AAACT9876Q1Z9', 'Specialized in Hardware Distribution & Cloud Licensing', 'active', 'approved'),
     (v3_id, 'Nexus Compute Systems', 'Vikramaditya Rao', 'procurement@nexuscompute.com', '+919900112233', '15 Mahatma Gandhi Road, Connaught Place, New Delhi', '07AAACN5432M1Z2', 'Enterprise supplier for HP and Dell IT Infrastructure', 'active', 'approved')
     ON CONFLICT DO NOTHING;
 
