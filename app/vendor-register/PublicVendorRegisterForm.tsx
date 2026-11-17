@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Layers, Loader2, CheckCircle2 } from 'lucide-react';
 import { submitVendorRegistration } from '@/actions/vendors';
 import { toast } from 'sonner';
@@ -94,8 +95,15 @@ export function PublicVendorRegisterForm({ categories }: { categories: any[] }) 
       {/* Header */}
       <div className="bg-slate-50 dark:bg-[#0d1322] border-b border-slate-200/80 dark:border-slate-800/80 p-6">
         <div className="flex items-center space-x-3 mb-1">
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold">
-            <Layers className="w-4 h-4" />
+          <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 p-1 border border-slate-200 dark:border-slate-700/60 shadow-xs flex items-center justify-center shrink-0">
+            <Image
+              src="/logo.png"
+              alt="Technosphere Logo"
+              width={36}
+              height={36}
+              className="w-full h-full object-contain"
+              priority
+            />
           </div>
           <div>
             <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight">Vendor Partner Onboarding</h1>

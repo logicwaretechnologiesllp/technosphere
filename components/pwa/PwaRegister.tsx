@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { Download, X } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -98,8 +99,14 @@ export function PwaRegister() {
     <div className="fixed bottom-5 right-5 z-50 max-w-sm w-full bg-slate-900/95 dark:bg-[#0f172a]/95 text-white border border-indigo-500/40 rounded-2xl p-4 shadow-2xl backdrop-blur-md animate-fade-in">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shrink-0 shadow-md shadow-indigo-600/40">
-            <Download className="w-5 h-5 text-white" />
+          <div className="w-11 h-11 rounded-xl bg-white p-1 flex items-center justify-center shrink-0 shadow-md shadow-black/20">
+            <Image
+              src="/logo.png"
+              alt="Technosphere App"
+              width={36}
+              height={36}
+              className="w-full h-full object-contain"
+            />
           </div>
           <div>
             <h4 className="font-extrabold text-xs text-white">Install Technosphere App</h4>

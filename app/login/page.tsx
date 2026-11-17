@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 import {
   Layers,
   Loader2,
@@ -24,8 +26,8 @@ export default function LoginPage() {
   const [step, setStep] = useState<'password' | 'mfa'>('password');
   const [mfaMethod, setMfaMethod] = useState<'totp' | 'email' | 'backup'>('totp');
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState('admin@admin.com');
-  const [password, setPassword] = useState('admin');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   // 2FA inputs
@@ -35,6 +37,7 @@ export default function LoginPage() {
   const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
   const [emailOtpSent, setEmailOtpSent] = useState(false);
   const [sendingEmailOtp, setSendingEmailOtp] = useState(false);
+  const [sentDestinationEmail, setSentDestinationEmail] = useState<string | null>(null);
 
   // Check if redirected due to required MFA
   useEffect(() => {
@@ -151,6 +154,9 @@ export default function LoginPage() {
 
     if (res.success) {
       setEmailOtpSent(true);
+      if (res.destinationEmail) {
+        setSentDestinationEmail(res.destinationEmail);
+      }
       toast.success(res.message || '6-Digit 2FA Code sent to your email.');
     } else {
       toast.error(res.error || 'Failed to send Email OTP.');
@@ -208,8 +214,21 @@ export default function LoginPage() {
       <div className="w-full max-w-sm bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-8 space-y-6 shadow-sm dark:shadow-2xl">
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white mx-auto font-bold shadow-xs">
-            {step === 'mfa' ? <ShieldCheck className="w-5 h-5" /> : <Layers className="w-5 h-5" />}
+          <div className="w-14 h-14 rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/90 dark:border-slate-700/80 p-2 shadow-sm mx-auto flex items-center justify-center">
+            {step === 'mfa' ? (
+              <div className="w-full h-full rounded-xl bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                <ShieldCheck className="w-7 h-7" />
+              </div>
+            ) : (
+              <Image
+                src="/logo.png"
+                alt="Technosphere Logo"
+                width={48}
+                height={48}
+                className="w-full h-full object-contain"
+                priority
+              />
+            )}
           </div>
           <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
             {step === 'mfa' ? 'Two-Factor Verification' : 'Technosphere Portal'}
@@ -233,15 +252,23 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@admin.com"
+                placeholder="name@company.com"
                 className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500 font-medium"
               />
             </div>
 
             <div>
-              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block font-medium text-slate-700 dark:text-slate-300">
+                  Password
+                </label>
+                <Link
+                  href="/forgot-password"
+                  className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 font-bold transition-colors"
+                >
+                  Forgot password?
+                </Link>
+              </div>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -377,7 +404,15 @@ export default function LoginPage() {
                     className="w-full px-3.5 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-center text-xl font-mono tracking-[0.5em] text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500 font-bold"
                   />
                   <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                    Click <strong>Send Code to Email</strong> to dispatch a 6-digit passcode to <strong className="text-slate-700 dark:text-slate-300">{email}</strong>.
+                    {emailOtpSent ? (
+                      <>
+                        Passcode dispatched to <strong className="text-slate-700 dark:text-slate-300">{sentDestinationEmail || email}</strong>. Valid for 10 minutes.
+                      </>
+                    ) : (
+                      <>
+                        Click <strong>Send Code to Email</strong> to dispatch a 6-digit passcode to <strong className="text-slate-700 dark:text-slate-300">{sentDestinationEmail || email}</strong>.
+                      </>
+                    )}
                   </p>
                 </div>
 
@@ -440,15 +475,6 @@ export default function LoginPage() {
             </button>
           </div>
         )}
-
-        {/* Credentials Info */}
-        <div className="p-3 bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/80 rounded-xl text-[11px] text-slate-500 dark:text-slate-400 space-y-1">
-          <p className="font-semibold text-slate-700 dark:text-slate-300 text-center">Default Credentials</p>
-          <div className="flex justify-between font-mono text-[10px]">
-            <span>Email: admin@admin.com</span>
-            <span>Password: admin</span>
-          </div>
-        </div>
       </div>
     </div>
   );

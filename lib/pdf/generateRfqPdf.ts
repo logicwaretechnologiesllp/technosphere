@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import PDFDocument from 'pdfkit';
 import { parseLineItemsFromLead, cleanSpecifications, cleanProductTitle } from '@/lib/leadUtils';
 import { formatDate } from '@/lib/utils';
@@ -89,25 +91,6 @@ export async function generateRfqPdf(lead: any, settings?: any): Promise<Buffer>
       // Top Indigo Decorative Accent Line
       doc.roundedRect(margin, margin, contentWidth, 5, 2).fill(indigoAccent);
 
-      // Company Title & Tagline
-      doc
-        .fillColor('#FFFFFF')
-        .fontSize(15)
-        .font('Helvetica-Bold')
-        .text(companyName, margin + 18, margin + 18, { width: 310 });
-
-      doc
-        .fillColor('#94A3B8')
-        .fontSize(8.5)
-        .font('Helvetica')
-        .text('Enterprise Procurement & Vendor Management Network', margin + 18, margin + 38);
-
-      doc
-        .fillColor('#CBD5E1')
-        .fontSize(8)
-        .font('Helvetica')
-        .text(`Email: ${companyEmail}  •  Phone: ${companyPhone}`, margin + 18, margin + 53);
-
       // Right RFQ Title Badge Card
       const badgeW = 160;
       const badgeH = 50;
@@ -127,6 +110,39 @@ export async function generateRfqPdf(lead: any, settings?: any): Promise<Buffer>
         .fontSize(9)
         .font('Helvetica-Bold')
         .text(`PR REF: ${prReference}`, badgeX + 5, badgeY + 28, { width: badgeW - 10, align: 'center' });
+
+      // Check if official logo exists
+      const logoPath = path.join(process.cwd(), 'public', 'logo.png');
+      const hasLogo = fs.existsSync(logoPath);
+
+      let textStartX = margin + 18;
+      if (hasLogo) {
+        try {
+          doc.image(logoPath, margin + 16, margin + 15, { fit: [48, 48], align: 'center', valign: 'center' });
+          textStartX = margin + 72;
+        } catch (e) {
+          console.error('Failed to embed logo in PDF:', e);
+        }
+      }
+
+      // Company Title & Tagline
+      doc
+        .fillColor('#FFFFFF')
+        .fontSize(14)
+        .font('Helvetica-Bold')
+        .text(companyName, textStartX, margin + 18, { width: badgeX - textStartX - 10 });
+
+      doc
+        .fillColor('#94A3B8')
+        .fontSize(8.5)
+        .font('Helvetica')
+        .text('Enterprise Procurement & Vendor Management Network', textStartX, margin + 38, { width: badgeX - textStartX - 10 });
+
+      doc
+        .fillColor('#CBD5E1')
+        .fontSize(8)
+        .font('Helvetica')
+        .text(`Email: ${companyEmail}  •  Phone: ${companyPhone}`, textStartX, margin + 53, { width: badgeX - textStartX - 10 });
 
       let currentY = margin + headerHeight + 12;
 

@@ -1,6 +1,8 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   Building2,
@@ -14,6 +16,7 @@ import {
   X,
 } from 'lucide-react';
 import { logoutAdmin } from '@/actions/auth';
+import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 
 interface AdminSidebarProps {
@@ -24,6 +27,33 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ pendingCount = 0, isMobile = false, onClose }: AdminSidebarProps) {
   const pathname = usePathname();
+  const [userEmail, setUserEmail] = useState('purchase@tsphere.net');
+  const [userName, setUserName] = useState('Technosphere Procurement');
+
+  useEffect(() => {
+    async function loadUser() {
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          if (user.email) setUserEmail(user.email);
+          const name = user.user_metadata?.full_name || (user.email ? user.email.split('@')[0] : 'Admin');
+          setUserName(name);
+        }
+      } catch {
+        // Fallback default
+      }
+    }
+    loadUser();
+  }, []);
+
+  const initials = userName
+    .split(' ')
+    .filter(Boolean)
+    .map((p) => p[0])
+    .join('')
+    .substring(0, 2)
+    .toUpperCase() || 'TP';
 
   const navItems = [
     {
@@ -76,8 +106,15 @@ export function AdminSidebar({ pendingCount = 0, isMobile = false, onClose }: Ad
           onClick={() => isMobile && onClose && onClose()}
           className="flex items-center space-x-2.5"
         >
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold shadow-xs">
-            <Layers className="w-4 h-4" />
+          <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 p-0.5 border border-slate-200 dark:border-slate-700/60 flex items-center justify-center shrink-0 shadow-xs overflow-hidden">
+            <Image
+              src="/logo.png"
+              alt="Technosphere Logo"
+              width={32}
+              height={32}
+              className="w-full h-full object-contain"
+              priority
+            />
           </div>
           <div>
             <h1 className="font-bold text-slate-900 dark:text-slate-100 tracking-tight text-sm">
@@ -159,15 +196,15 @@ export function AdminSidebar({ pendingCount = 0, isMobile = false, onClose }: Ad
       <div className="p-3 border-t border-slate-200/80 dark:border-slate-800/80 bg-slate-50/50 dark:bg-[#0a0f1b]/50 shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2.5 truncate">
-            <div className="w-7 h-7 rounded-md bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 text-[11px] font-semibold shrink-0">
-              AD
+            <div className="w-7 h-7 rounded-md bg-indigo-600/10 text-indigo-600 dark:bg-indigo-600/20 dark:text-indigo-400 font-extrabold flex items-center justify-center text-[10px] shrink-0 border border-indigo-200/50 dark:border-indigo-800/50">
+              {initials}
             </div>
             <div className="truncate">
-              <p className="text-xs font-medium text-slate-900 dark:text-slate-200 truncate">
-                Admin User
+              <p className="text-xs font-bold text-slate-900 dark:text-slate-200 truncate">
+                {userName}
               </p>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
-                admin@admin.com
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate font-medium">
+                {userEmail}
               </p>
             </div>
           </div>

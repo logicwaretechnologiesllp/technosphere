@@ -3,6 +3,7 @@
 import { Menu, RefreshCw, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import Image from 'next/image';
 import { toast } from 'sonner';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { logoutAdmin } from '@/actions/auth';
@@ -41,6 +42,10 @@ export function AdminHeader({ title, onOpenMobileSidebar }: AdminHeaderProps) {
             <Menu className="w-5 h-5" />
           </button>
         )}
+
+        <div className="w-6 h-6 rounded-md bg-white dark:bg-slate-800 p-0.5 border border-slate-200 dark:border-slate-700/60 md:hidden shrink-0 flex items-center justify-center">
+          <Image src="/logo.png" alt="Technosphere" width={20} height={20} className="w-full h-full object-contain" />
+        </div>
 
         <h2 className="text-xs sm:text-base font-bold text-slate-900 dark:text-slate-100 tracking-tight truncate">
           {title}

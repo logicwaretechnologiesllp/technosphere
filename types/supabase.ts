@@ -478,6 +478,7 @@ export type Database = {
           code_hash: string
           expires_at: string
           id: string
+          target_email: string | null
           used: boolean
           user_id: string
         }
@@ -486,12 +487,44 @@ export type Database = {
           code_hash: string
           expires_at: string
           id?: string
+          target_email?: string | null
           used?: boolean
           user_id: string
         }
         Update: {
           created_at?: string
           code_hash?: string
+          expires_at?: string
+          id?: string
+          target_email?: string | null
+          used?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
+      password_reset_challenges: {
+        Row: {
+          created_at: string
+          code_hash: string
+          email: string
+          expires_at: string
+          id: string
+          used: boolean
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          code_hash: string
+          email: string
+          expires_at: string
+          id?: string
+          used?: boolean
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          code_hash?: string
+          email?: string
           expires_at?: string
           id?: string
           used?: boolean
@@ -503,6 +536,7 @@ export type Database = {
         Row: {
           created_at: string
           email_otp_enabled: boolean
+          otp_email: string | null
           preferred_method: string
           totp_enabled: boolean
           updated_at: string
@@ -511,6 +545,7 @@ export type Database = {
         Insert: {
           created_at?: string
           email_otp_enabled?: boolean
+          otp_email?: string | null
           preferred_method?: string
           totp_enabled?: boolean
           updated_at?: string
@@ -519,6 +554,7 @@ export type Database = {
         Update: {
           created_at?: string
           email_otp_enabled?: boolean
+          otp_email?: string | null
           preferred_method?: string
           totp_enabled?: boolean
           updated_at?: string

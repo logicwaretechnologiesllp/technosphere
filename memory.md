@@ -51,6 +51,10 @@ This document serves as the persistent architectural reference and memory record
 8. `lead_vendors`: Junction table tracking assigned vendors for each RFQ, recording email dispatch status and WhatsApp preparation timestamps.
 9. `message_logs`: Audit trail for all outgoing email and WhatsApp communications.
 10. `system_settings`: Company metadata, branding addresses, GST, and SMTP credentials.
+11. `password_reset_challenges`: 6-digit numeric OTP challenge tokens for forgotten password recovery (`user_id`, `email`, `code_hash`, `expires_at`, `used`).
+12. `user_mfa_settings`: MFA preferences, TOTP enforcement, Email OTP enforcement, and `otp_email` (custom configured email for receiving 2FA OTP codes).
+13. `email_otp_challenges`: 6-digit numeric OTP challenges for MFA logins and configuration verifications (`user_id`, `target_email`, `code_hash`, `expires_at`, `used`).
+14. `mfa_backup_codes`: Single-use emergency recovery backup keys.
 
 ### Dual-Layer Storage Pattern (Production Resiliency)
 In strict adherence to production standards:
@@ -106,6 +110,21 @@ In strict adherence to production standards:
 - **Client Component**: `MessageLogsClient.tsx` with live debounced search by recipient/subject, channel switcher (All, Email, WhatsApp), delivery status filter, and live record count metrics.
 - **Audit Viewer**: In-line modal preview allows reading the exact message body, parameters, and error logs for any dispatch.
 - **Database Indexes**: Indexed `created_at DESC`, `channel`, `status`, `lead_id`, and `vendor_id` on `message_logs`.
+
+### 4.7 Forgot Password & Change Password Flows
+- **Forgot Password**: Route `/forgot-password` with OTP verification.
+  - Step 1: User enters registered email; server generates cryptographically secure 6-digit OTP, stores SHA-256 hash in `password_reset_challenges` with 10-minute expiry, and sends branded HTML email via configured SMTP.
+  - Step 2: User enters 6-digit OTP, new password, and confirms password with live strength verification and matching feedback.
+  - Step 3: Server verifies active unexpired OTP challenge, marks used, and updates user credentials via Supabase Admin Auth API.
+- **Change Password**: Located in `/dashboard/settings` -> Security & 2FA tab.
+  - Re-authenticates current password with Supabase Auth before updating to the new password.
+  - Enforces minimum 8 characters with letter and number/symbol complexity.
+
+### 4.8 Custom Email 2FA Configuration
+- **Configurable 2FA Destination**: When configuring Email 2FA under Settings -> Security & 2FA, the modal prompts the user for the specific destination email address.
+- **Pre-Activation Test Verification**: Dispatches a 6-digit verification code to the target email before enabling.
+- **Persistent Destination**: Stored in `user_mfa_settings.otp_email`. Login 2FA codes are automatically routed to the configured 2FA email, with masked email feedback for user privacy.
+- **Reconfiguration**: Administrators can click "Change 2FA Email" to update the destination address at any time.
 
 ---
 

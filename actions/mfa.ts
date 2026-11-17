@@ -43,19 +43,24 @@ async function ensureMfaTablesExist() {
         CREATE TABLE IF NOT EXISTS public.email_otp_challenges (
           id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
           user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+          target_email TEXT,
           code_hash TEXT NOT NULL,
           expires_at TIMESTAMPTZ NOT NULL,
           used BOOLEAN NOT NULL DEFAULT FALSE,
           created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         );
+        ALTER TABLE public.email_otp_challenges ADD COLUMN IF NOT EXISTS target_email TEXT;
+
         CREATE TABLE IF NOT EXISTS public.user_mfa_settings (
           user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
           email_otp_enabled BOOLEAN NOT NULL DEFAULT FALSE,
           totp_enabled BOOLEAN NOT NULL DEFAULT FALSE,
           preferred_method TEXT NOT NULL DEFAULT 'totp',
+          otp_email TEXT,
           created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
           updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         );
+        ALTER TABLE public.user_mfa_settings ADD COLUMN IF NOT EXISTS otp_email TEXT;
       `,
     });
   } catch {
@@ -105,6 +110,7 @@ export async function getMfaSecurityOverview() {
       userEmail: user.email,
       isTotpEnabled,
       isEmailOtpEnabled: Boolean(mfaRecord?.email_otp_enabled),
+      configuredOtpEmail: mfaRecord?.otp_email || user.email,
       isSmtpConfigured,
       backupCodesCount: backupCodes?.length || 0,
       preferredMethod: mfaRecord?.preferred_method || 'totp',
@@ -115,13 +121,19 @@ export async function getMfaSecurityOverview() {
   }
 }
 
-export async function sendEmailOtpVerificationCode() {
+export async function sendEmailOtpVerificationCode(targetEmail?: string) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user || !user.email) {
-      return { success: false, error: 'User email not found.' };
+      return { success: false, error: 'User session not found.' };
+    }
+
+    const destinationEmail = targetEmail?.trim()?.toLowerCase() || user.email?.trim()?.toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!destinationEmail || !emailRegex.test(destinationEmail)) {
+      return { success: false, error: 'Please provide a valid email address for 2FA verification.' };
     }
 
     const settingsRes = await getSystemSettings();
@@ -142,9 +154,10 @@ export async function sendEmailOtpVerificationCode() {
     const adminSupabase = createAdminClient();
     await ensureMfaTablesExist();
 
-    // Store challenge
+    // Store challenge with target email
     await adminSupabase.from('email_otp_challenges').insert({
       user_id: user.id,
+      target_email: destinationEmail,
       code_hash: codeHash,
       expires_at: expiresAt,
       used: false,
@@ -165,12 +178,12 @@ export async function sendEmailOtpVerificationCode() {
 
     await transporter.sendMail({
       from: `"${fromName}" <${fromEmail}>`,
-      to: user.email,
+      to: destinationEmail,
       subject: 'Technosphere 2FA — Email Verification Code',
       html: `
         <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;">
           <div style="text-align: center; margin-bottom: 20px;">
-            <div style="width: 44px; h-44px; background: #4f46e5; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; color: #ffffff; font-weight: bold; font-size: 20px; margin-bottom: 8px;">T</div>
+            <div style="width: 44px; height: 44px; background: #4f46e5; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; color: #ffffff; font-weight: bold; font-size: 20px; margin-bottom: 8px;">T</div>
             <h2 style="margin: 0; color: #0f172a; font-size: 20px; font-weight: 800;">Email 2FA Verification</h2>
             <p style="margin: 4px 0 0 0; color: #64748b; font-size: 13px;">Confirm your email address to enable Email OTP 2FA</p>
           </div>
@@ -181,20 +194,24 @@ export async function sendEmailOtpVerificationCode() {
           </div>
 
           <p style="font-size: 12px; color: #475569; line-height: 1.5; margin: 0 0 16px 0;">
-            Enter this 6-digit code in your Technosphere Settings panel to finalize turning on Email Two-Factor Authentication.
+            Enter this 6-digit code in your Technosphere Settings panel to finalize turning on Email Two-Factor Authentication for <strong>${destinationEmail}</strong>.
           </p>
         </div>
       `,
     });
 
-    return { success: true, message: `Verification code sent to ${user.email}` };
+    return {
+      success: true,
+      message: `Verification code sent to ${destinationEmail}`,
+      targetEmail: destinationEmail,
+    };
   } catch (err: any) {
     console.error('Error sending Email OTP:', err);
     return { success: false, error: err.message || 'Failed to send verification email' };
   }
 }
 
-export async function verifyAndEnableEmailOtp(code: string) {
+export async function verifyAndEnableEmailOtp(code: string, targetEmail?: string) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -233,14 +250,21 @@ export async function verifyAndEnableEmailOtp(code: string) {
       .update({ used: true })
       .eq('id', challenge.id);
 
-    // Update user MFA settings
+    const verifiedEmail = challenge.target_email || targetEmail?.trim()?.toLowerCase() || user.email;
+
+    // Update user MFA settings with configured 2FA email
     await adminSupabase.from('user_mfa_settings').upsert({
       user_id: user.id,
       email_otp_enabled: true,
+      otp_email: verifiedEmail,
       updated_at: new Date().toISOString(),
     });
 
-    return { success: true, message: 'Email OTP 2FA Enabled Successfully!' };
+    return {
+      success: true,
+      message: `Email OTP 2FA Enabled for ${verifiedEmail}!`,
+      configuredOtpEmail: verifiedEmail,
+    };
   } catch (err: any) {
     console.error('Error verifying Email OTP:', err);
     return { success: false, error: err.message };
@@ -315,6 +339,15 @@ export async function sendLoginEmailOtp(email: string) {
     const user = usersData.users.find((u) => u.email?.toLowerCase() === cleanEmail);
     if (!user) return { success: false, error: 'User account not found' };
 
+    // Check if user has a custom configured 2FA email
+    const { data: mfaSettings } = await adminSupabase
+      .from('user_mfa_settings')
+      .select('otp_email')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    const destinationEmail = mfaSettings?.otp_email?.trim()?.toLowerCase() || user.email?.trim()?.toLowerCase() || cleanEmail;
+
     const settingsRes = await getSystemSettings();
     const smtp = settingsRes.settings;
 
@@ -329,6 +362,7 @@ export async function sendLoginEmailOtp(email: string) {
     await ensureMfaTablesExist();
     await adminSupabase.from('email_otp_challenges').insert({
       user_id: user.id,
+      target_email: destinationEmail,
       code_hash: codeHash,
       expires_at: expiresAt,
       used: false,
@@ -348,7 +382,7 @@ export async function sendLoginEmailOtp(email: string) {
 
     await transporter.sendMail({
       from: `"${fromName}" <${fromEmail}>`,
-      to: cleanEmail,
+      to: destinationEmail,
       subject: 'Technosphere Login — 2FA Code',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background: #ffffff;">
@@ -360,7 +394,17 @@ export async function sendLoginEmailOtp(email: string) {
       `,
     });
 
-    return { success: true, message: `Login 2FA code sent to ${cleanEmail}` };
+    // Mask destination email for privacy
+    const [namePart, domainPart] = destinationEmail.split('@');
+    const masked = domainPart
+      ? `${namePart.length <= 2 ? namePart[0] + '*' : namePart[0] + '*'.repeat(Math.min(namePart.length - 2, 4)) + namePart[namePart.length - 1]}@${domainPart}`
+      : destinationEmail;
+
+    return {
+      success: true,
+      message: `Login 2FA code sent to ${masked}`,
+      destinationEmail: masked,
+    };
   } catch (err: any) {
     console.error('Error sending login Email OTP:', err);
     return { success: false, error: err.message || 'Failed to send login code' };

@@ -15,7 +15,7 @@ export async function proxy(request: NextRequest) {
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)!,
     {
       cookies: {
         getAll() {
@@ -50,6 +50,8 @@ export async function proxy(request: NextRequest) {
   // Public paths that do not require authentication
   const isPublicPath =
     pathname === '/login' ||
+    pathname === '/forgot-password' ||
+    pathname.startsWith('/forgot-password') ||
     pathname.startsWith('/vendor-register') ||
     pathname === '/offline.html' ||
     pathname === '/manifest.json' ||
@@ -75,7 +77,7 @@ export async function proxy(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    if (!isMfaPending && pathname === '/login') {
+    if (!isMfaPending && (pathname === '/login' || pathname === '/forgot-password')) {
       const url = request.nextUrl.clone();
       url.pathname = '/dashboard';
       return NextResponse.redirect(url);
