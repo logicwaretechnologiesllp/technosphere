@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Loader2,
   Eye,
@@ -37,6 +38,11 @@ export function PendingRegistrationsTable({
   const [selectedRegForReject, setSelectedRegForReject] = useState<any | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const getCategoryObjects = (catIds: string[]) => {
     if (!catIds || catIds.length === 0) return [];
@@ -201,9 +207,9 @@ export function PendingRegistrationsTable({
       </div>
 
       {/* VENDOR REGISTRATION DETAILS & APPROVAL MODAL */}
-      {selectedRegForView && (
-        <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md p-4 sm:p-6 flex items-center justify-center animate-fade-in">
-          <div className="relative w-full max-w-2xl bg-white dark:bg-[#111827] border border-slate-200/90 dark:border-slate-800/90 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh] my-auto">
+      {mounted && selectedRegForView && createPortal(
+        <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md p-3 sm:p-4 md:p-6 flex items-center justify-center">
+          <div className="relative w-full max-w-2xl bg-white dark:bg-[#111827] border border-slate-200/90 dark:border-slate-800/90 rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[calc(100dvh-2.5rem)] max-h-[820px] my-auto animate-fade-in">
             {/* Top Accent Gradient Line */}
             <div className="h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 w-full shrink-0" />
 
@@ -440,13 +446,14 @@ export function PendingRegistrationsTable({
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* REJECT REASON MODAL */}
-      {selectedRegForReject && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
-          <div className="relative w-full max-w-md bg-white dark:bg-[#111827] border border-slate-200/90 dark:border-slate-800/90 rounded-2xl p-6 space-y-4 shadow-2xl my-auto">
+      {mounted && selectedRegForReject && createPortal(
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="relative w-full max-w-md bg-white dark:bg-[#111827] border border-slate-200/90 dark:border-slate-800/90 rounded-2xl p-6 space-y-4 shadow-2xl my-auto animate-fade-in">
             <h4 className="font-extrabold text-slate-900 dark:text-slate-100 text-sm flex items-center space-x-2">
               <ShieldAlert className="w-4 h-4 text-rose-500" />
               <span>Reject Registration — {selectedRegForReject.company_name}</span>
@@ -485,7 +492,8 @@ export function PendingRegistrationsTable({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Building2, User, Mail, Phone, MapPin, FileCheck, CheckSquare, Loader2, ChevronRight } from 'lucide-react';
 import { createVendor, type VendorInput } from '@/actions/vendors';
 import { toast } from 'sonner';
@@ -22,6 +23,11 @@ export function AddVendorModal({
   onSuccess: () => void;
 }) {
   const [loading, setLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [formData, setFormData] = useState<VendorInput>({
     company_name: '',
     contact_person: '',
@@ -45,7 +51,7 @@ export function AddVendorModal({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
   const handleCategoryToggle = (categoryId: string) => {
     setFormData((prev) => {
@@ -77,13 +83,13 @@ export function AddVendorModal({
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-950/70 backdrop-blur-md animate-fade-in">
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-950/70 backdrop-blur-md">
       <div className="absolute inset-0" onClick={onClose} />
 
       <form
         onSubmit={handleSubmit}
-        className="relative z-10 bg-white dark:bg-[#0b1120] border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-2xl flex flex-col h-[calc(100dvh-2.5rem)] max-h-[720px] shadow-2xl shadow-slate-950/50 overflow-hidden my-auto"
+        className="relative z-10 bg-white dark:bg-[#0b1120] border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-2xl flex flex-col h-[calc(100dvh-2.5rem)] max-h-[720px] shadow-2xl shadow-slate-950/50 overflow-hidden my-auto animate-fade-in"
       >
         {/* Modal Header */}
         <div className="px-5 py-4 sm:px-6 border-b border-slate-200 dark:border-slate-800/80 flex items-center justify-between bg-slate-50/80 dark:bg-[#0d1527] shrink-0">
@@ -370,6 +376,7 @@ export function AddVendorModal({
           </button>
         </div>
       </form>
-    </div>
+    </div>,
+    document.body
   );
 }

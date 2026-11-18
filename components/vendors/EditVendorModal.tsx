@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Building2, CheckSquare, Loader2 } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { X, Building2, CheckSquare, Loader2, Trash2 } from 'lucide-react';
 import { updateVendor, type VendorInput } from '@/actions/vendors';
 import { toast } from 'sonner';
 
@@ -16,14 +17,22 @@ export function EditVendorModal({
   vendor,
   categories,
   onSuccess,
+  onDelete,
 }: {
   isOpen: boolean;
   onClose: () => void;
   vendor: any;
   categories: Category[];
   onSuccess: () => void;
+  onDelete?: (vendor: any) => void;
 }) {
   const [loading, setLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [formData, setFormData] = useState<VendorInput>({
     company_name: '',
     contact_person: '',
@@ -58,7 +67,7 @@ export function EditVendorModal({
     }
   }, [vendor]);
 
-  if (!isOpen || !vendor) return null;
+  if (!isOpen || !vendor || !mounted) return null;
 
   const handleCategoryToggle = (categoryId: string) => {
     setFormData((prev) => {
@@ -85,12 +94,18 @@ export function EditVendorModal({
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-md animate-fade-in">
-      <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl">
-        <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-[#0d1322]">
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-950/70 backdrop-blur-md">
+      <div className="absolute inset-0" onClick={onClose} />
+
+      <form
+        onSubmit={handleSubmit}
+        className="relative z-10 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-3xl flex flex-col h-[calc(100dvh-2.5rem)] max-h-[820px] shadow-2xl shadow-slate-950/60 overflow-hidden my-auto animate-fade-in"
+      >
+        {/* Modal Header */}
+        <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-[#0d1322] shrink-0">
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-600/20 border border-indigo-200 dark:border-indigo-500/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+            <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-600/20 border border-indigo-200 dark:border-indigo-500/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
               <Building2 className="w-5 h-5" />
             </div>
             <div>
@@ -99,6 +114,7 @@ export function EditVendorModal({
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
             className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
@@ -106,7 +122,8 @@ export function EditVendorModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+        {/* Scrollable Form Body */}
+        <div className="p-6 sm:p-7 space-y-5 overflow-y-auto flex-1">
           <div>
             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Company Name</label>
             <input
@@ -211,8 +228,13 @@ export function EditVendorModal({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Assigned Categories</label>
-            <div className="p-3 bg-slate-50 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-xl grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-36 overflow-y-auto">
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                Assigned Categories ({formData.category_ids?.length || 0} selected)
+              </label>
+              <span className="text-[11px] text-slate-400">Select all applicable procurement categories</span>
+            </div>
+            <div className="p-3.5 bg-slate-50 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 max-h-56 overflow-y-auto">
               {categories.map((cat) => {
                 const isSelected = formData.category_ids?.includes(cat.id);
                 return (
@@ -284,25 +306,41 @@ export function EditVendorModal({
             />
           </div>
 
-          <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end space-x-3">
+        </div>
+
+        {/* Modal Footer */}
+        <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/60 dark:bg-[#0d1322] shrink-0">
+          {onDelete ? (
+            <button
+              type="button"
+              onClick={() => onDelete(vendor)}
+              className="px-3.5 py-2 rounded-xl text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-rose-200 dark:border-rose-900/40 flex items-center space-x-1.5 transition-colors cursor-pointer"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Delete Vendor</span>
+            </button>
+          ) : <div />}
+
+          <div className="flex items-center space-x-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 flex items-center space-x-2 disabled:opacity-50 shadow-md shadow-indigo-600/30"
+              className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 flex items-center space-x-2 disabled:opacity-50 shadow-md shadow-indigo-600/30 transition-all cursor-pointer"
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin" />}
               <span>Update Vendor</span>
             </button>
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+      </form>
+    </div>,
+    document.body
   );
 }

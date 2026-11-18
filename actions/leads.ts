@@ -183,7 +183,7 @@ export async function getLeadsPaginated({
 
     if (search && search.trim()) {
       const s = `%${search.trim()}%`;
-      query = query.or(`lead_number.ilike.${s},customer_name.ilike.${s},lead_name.ilike.${s},product_item.ilike.${s},expected_credit.ilike.${s}`);
+      query = query.or(`lead_number.ilike.${s},customer_name.ilike.${s},lead_name.ilike.${s},product_item.ilike.${s}`);
     }
 
     query = query.range(from, to);
@@ -256,7 +256,7 @@ export async function getLeads(filters?: { search?: string; status?: string; cat
 
     if (filters?.search && filters.search.trim()) {
       const s = `%${filters.search.trim()}%`;
-      query = query.or(`lead_number.ilike.${s},customer_name.ilike.${s},lead_name.ilike.${s},product_item.ilike.${s},expected_credit.ilike.${s}`);
+      query = query.or(`lead_number.ilike.${s},customer_name.ilike.${s},lead_name.ilike.${s},product_item.ilike.${s}`);
     }
 
     const { data, error } = await query;

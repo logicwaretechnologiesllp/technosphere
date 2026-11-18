@@ -178,6 +178,46 @@ export async function toggleVendorStatus(id: string, currentStatus: string) {
   return updateVendor(id, { status: newStatus as 'active' | 'inactive' });
 }
 
+export async function deleteVendor(id: string) {
+  try {
+    const supabase = createAdminClient();
+
+    // 1. Fetch vendor to confirm existence and get company name
+    const { data: vendor, error: fetchErr } = await supabase
+      .from('vendors')
+      .select('company_name')
+      .eq('id', id)
+      .single();
+
+    if (fetchErr || !vendor) {
+      return { success: false, error: 'Vendor not found or already deleted.' };
+    }
+
+    // 2. Explicitly clean relations
+    await supabase.from('vendor_categories').delete().eq('vendor_id', id);
+    await supabase.from('lead_vendors').delete().eq('vendor_id', id);
+    await supabase.from('leads').update({ winning_vendor_id: null }).eq('winning_vendor_id', id);
+    await supabase.from('vendor_registrations').update({ vendor_id: null }).eq('vendor_id', id);
+    await supabase.from('message_logs').update({ vendor_id: null }).eq('vendor_id', id);
+
+    // 3. Delete the vendor record
+    const { error: deleteErr } = await supabase
+      .from('vendors')
+      .delete()
+      .eq('id', id);
+
+    if (deleteErr) throw deleteErr;
+
+    revalidatePath('/dashboard/vendors');
+    revalidatePath('/dashboard/leads');
+    revalidatePath('/dashboard');
+    return { success: true, message: `Vendor "${vendor.company_name}" has been permanently deleted.` };
+  } catch (error: any) {
+    console.error('Error deleting vendor:', error);
+    return { success: false, error: error.message || 'Failed to delete vendor.' };
+  }
+}
+
 export async function getPendingRegistrations() {
   try {
     const supabase = createAdminClient();
